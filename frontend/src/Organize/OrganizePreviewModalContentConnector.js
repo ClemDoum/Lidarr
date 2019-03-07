@@ -40,17 +40,24 @@ class OrganizePreviewModalContentConnector extends Component {
   // Lifecycle
 
   componentDidMount() {
+    this.props.fetchNamingSettings();
+  }
+
+  componentDidUpdate() {
     const {
       artistId,
-      albumId
+      albumId,
+      renameTracks,
+      isPopulated,
+      isFetching
     } = this.props;
 
-    this.props.fetchOrganizePreview({
-      artistId,
-      albumId
-    });
-
-    this.props.fetchNamingSettings();
+    if (renameTracks && !isPopulated && !isFetching) {
+      this.props.fetchOrganizePreview({
+        artistId,
+        albumId
+      });
+    }
   }
 
   //
@@ -82,6 +89,9 @@ class OrganizePreviewModalContentConnector extends Component {
 OrganizePreviewModalContentConnector.propTypes = {
   artistId: PropTypes.number.isRequired,
   albumId: PropTypes.number,
+  renameTracks: PropTypes.bool.isRequired,
+  isPopulated: PropTypes.bool.isRequired,
+  isFetching: PropTypes.bool.isRequired,
   fetchOrganizePreview: PropTypes.func.isRequired,
   fetchNamingSettings: PropTypes.func.isRequired,
   executeCommand: PropTypes.func.isRequired,

@@ -189,7 +189,7 @@ namespace NzbDrone.Core.MediaFiles.TrackImport.Identification
 
             var allTracks = _trackService.GetTracksByReleases(candidateReleases.Select(x => x.Id).ToList());
 
-            _logger.Debug($"Got tracks in {watch.ElapsedMilliseconds}ms");
+            _logger.Debug($"Retrieved {allTracks.Count} possible tracks in {watch.ElapsedMilliseconds}ms");
             
             GetBestRelease(localAlbumRelease, candidateReleases, allTracks);
 
@@ -233,7 +233,7 @@ namespace NzbDrone.Core.MediaFiles.TrackImport.Identification
             if (releaseIds.Count == 1 && releaseIds[0].IsNotNullOrWhiteSpace())
             {
                 _logger.Debug("Selecting release from consensus ForeignReleaseId [{0}]", releaseIds[0]);
-                return _releaseService.GetReleasesByForeignReleaseId(releaseIds);
+                return new List<AlbumRelease> { _releaseService.GetReleaseByForeignReleaseId(releaseIds[0]) };
             }
 
             if (release != null)
