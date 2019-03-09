@@ -28,6 +28,7 @@ namespace NzbDrone.Core.MediaFiles
         public string Album { get; set; }
         public uint Disc { get; set; }
         public uint DiscCount { get; set; }
+        public string Media { get; set; }
         public DateTime? Date { get; set; }
         public DateTime? OriginalReleaseDate { get; set; }
         public uint Year { get; set; }
@@ -93,6 +94,7 @@ namespace NzbDrone.Core.MediaFiles
                 if (file.TagTypesOnDisk.HasFlag(TagTypes.Id3v2))
                 {
                     var id3tag = (TagLib.Id3v2.Tag) file.GetTag(TagTypes.Id3v2);
+                    Media = id3tag.GetTextAsString("TMED");
                     Date = ReadId3Date(id3tag, "TDRC", "TYER", "TDAT");
                     OriginalReleaseDate = ReadId3Date(id3tag, "TDOR", "TORY", null);
                     MusicBrainzAlbumComment = UserTextInformationFrame.Get(id3tag, "MusicBrainz Album Comment", false)?.Text.ExclusiveOrDefault();
@@ -103,6 +105,7 @@ namespace NzbDrone.Core.MediaFiles
                     // while publisher is handled by taglib, it seems to be mapped to 'ORGANIZATION' and not 'LABEL' like Picard is
                     // https://picard.musicbrainz.org/docs/mappings/
                     var flactag = (TagLib.Ogg.XiphComment) file.GetTag(TagLib.TagTypes.Xiph);
+                    Media = flactag.GetField("MEDIA").ExclusiveOrDefault();
                     Date = DateTime.TryParse(flactag.GetField("DATE").ExclusiveOrDefault(), out tempDate) ? tempDate : default(DateTime?);
                     OriginalReleaseDate = DateTime.TryParse(flactag.GetField("ORIGINALDATE").ExclusiveOrDefault(), out tempDate) ? tempDate : default(DateTime?);
                     Publisher = flactag.GetField("LABEL").ExclusiveOrDefault();
@@ -112,6 +115,7 @@ namespace NzbDrone.Core.MediaFiles
                 else if (file.TagTypesOnDisk.HasFlag(TagTypes.Ape))
                 {
                     var apetag = (TagLib.Ape.Tag) file.GetTag(TagTypes.Ape);
+                    Media = apetag.GetItem("Media")?.ToString();
                     Date = DateTime.TryParse(apetag.GetItem("Year")?.ToString(), out tempDate) ? tempDate : default(DateTime?);
                     OriginalReleaseDate = DateTime.TryParse(apetag.GetItem("Original Date")?.ToString(), out tempDate) ? tempDate : default(DateTime?);
                     Publisher = apetag.GetItem("Label")?.ToString();
@@ -121,6 +125,7 @@ namespace NzbDrone.Core.MediaFiles
                 else if (file.TagTypesOnDisk.HasFlag(TagTypes.Asf))
                 {
                     var asftag = (TagLib.Asf.Tag) file.GetTag(TagTypes.Asf);
+                    Media = asftag.GetDescriptorString("WM/Media");
                     Date = DateTime.TryParse(asftag.GetDescriptorString("WM/Year"), out tempDate) ? tempDate : default(DateTime?);
                     OriginalReleaseDate = DateTime.TryParse(asftag.GetDescriptorString("WM/OriginalReleaseTime"), out tempDate) ? tempDate : default(DateTime?);
                     Publisher = asftag.GetDescriptorString("WM/Publisher");
@@ -130,6 +135,7 @@ namespace NzbDrone.Core.MediaFiles
                 else if (file.TagTypesOnDisk.HasFlag(TagTypes.Apple))
                 {
                     var appletag = (TagLib.Mpeg4.AppleTag) file.GetTag(TagTypes.Apple);
+                    Media = appletag.GetDashBox("com.apple.iTunes", "MEDIA");
                     Date = DateTime.TryParse(appletag.DataBoxes(FixAppleId("day")).First().Text, out tempDate) ? tempDate : default(DateTime?);
                     OriginalReleaseDate = DateTime.TryParse(appletag.GetDashBox("com.apple.iTunes", "Original Date"), out tempDate) ? tempDate : default(DateTime?);
                     MusicBrainzAlbumComment = appletag.GetDashBox("com.apple.iTunes", "MusicBrainz Album Comment");
@@ -191,8 +197,6 @@ namespace NzbDrone.Core.MediaFiles
             string date = tag.GetTextAsString(dateTag);
             string year = tag.GetTextAsString(yearTag);
             string day = dayTag.IsNotNullOrWhiteSpace() ? tag.GetTextAsString(dayTag) : null;
-            
-            Logger.Debug($"date: {date} year: {year} day: {day}");
             
             // Id3v4 date already complete in one tag
             if (date.IsNotNullOrWhiteSpace())
@@ -288,6 +292,7 @@ namespace NzbDrone.Core.MediaFiles
                 if (file.TagTypes.HasFlag(TagTypes.Id3v2))
                 {
                     var id3tag = (TagLib.Id3v2.Tag) file.GetTag(TagTypes.Id3v2);
+                    id3tag.SetTextFrame("TMED", Media);
                     WriteId3Date(id3tag, "TDRC", Date);
                     WriteId3Date(id3tag, "TDOR", OriginalReleaseDate);
                     WriteId3Tag(id3tag, "MusicBrainz Album Comment", MusicBrainzAlbumComment);
@@ -310,6 +315,7 @@ namespace NzbDrone.Core.MediaFiles
                         flactag.SetField("ORIGINALYEAR", OriginalReleaseDate.Value.Year.ToString());
                     }
 
+                    flactag.SetField("MEDIA", Media);
                     flactag.SetField("LABEL", Publisher);
                     flactag.SetField("MUSICBRAINZ_ALBUMCOMMENT", MusicBrainzAlbumComment);
                     flactag.SetField("MUSICBRAINZ_RELEASETRACKID", MusicBrainzReleaseTrackId);
@@ -328,6 +334,7 @@ namespace NzbDrone.Core.MediaFiles
                         apetag.SetValue("Original Year", OriginalReleaseDate.Value.Year.ToString());
                     }
                     
+                    apetag.SetValue("Media", Media);
                     apetag.SetValue("Label", Publisher);
                     apetag.SetValue("MUSICBRAINZ_ALBUMCOMMENT", MusicBrainzAlbumComment);
                     apetag.SetValue("MUSICBRAINZ_RELEASETRACKID", MusicBrainzReleaseTrackId);
@@ -346,6 +353,7 @@ namespace NzbDrone.Core.MediaFiles
                         asftag.SetDescriptorString(OriginalReleaseDate.Value.Year.ToString(), "WM/OriginalReleaseYear");
                     }
 
+                    asftag.SetDescriptorString(Media, "WM/Media");
                     asftag.SetDescriptorString(Publisher, "WM/Publisher");
                     asftag.SetDescriptorString(MusicBrainzAlbumComment, "MusicBrainz/Album Comment");
                     asftag.SetDescriptorString(MusicBrainzReleaseTrackId, "MusicBrainz/Release Track Id");
@@ -364,6 +372,7 @@ namespace NzbDrone.Core.MediaFiles
                         appletag.SetDashBox("com.apple.iTunes", "Original Year", OriginalReleaseDate.Value.Year.ToString());
                     }
                     
+                    appletag.SetDashBox("com.apple.iTunes", "MEDIA", Media);
                     appletag.SetDashBox("com.apple.iTunes", "MusicBrainz Album Comment", MusicBrainzAlbumComment);
                     appletag.SetDashBox("com.apple.iTunes", "MusicBrainz Release Track Id", MusicBrainzReleaseTrackId);
                 }
@@ -432,6 +441,11 @@ namespace NzbDrone.Core.MediaFiles
             if (DiscCount != other.DiscCount)
             {
                 output.Add("Disc Count", Tuple.Create(DiscCount.ToString(), other.DiscCount.ToString()));
+            }
+
+            if (Media != other.Media)
+            {
+                output.Add("Media Format", Tuple.Create(Media, other.Media));
             }
 
             if (Year != other.Year)
