@@ -4,7 +4,6 @@ import { connect } from 'react-redux';
 import { createSelector } from 'reselect';
 import createArtistSelector from 'Store/Selectors/createArtistSelector';
 import { fetchRetagPreview } from 'Store/Actions/retagPreviewActions';
-import { fetchMetadataProvider } from 'Store/Actions/settingsActions';
 import { executeCommand } from 'Store/Actions/commandActions';
 import * as commandNames from 'Commands/commandNames';
 import RetagPreviewModalContent from './RetagPreviewModalContent';
@@ -12,15 +11,12 @@ import RetagPreviewModalContent from './RetagPreviewModalContent';
 function createMapStateToProps() {
   return createSelector(
     (state) => state.retagPreview,
-    (state) => state.settings.metadataProvider,
     createArtistSelector(),
-    (retagPreview, metadataSettings, artist) => {
+    (retagPreview, artist) => {
       const props = { ...retagPreview };
-      props.isFetching = retagPreview.isFetching || metadataSettings.isFetching;
-      props.isPopulated = retagPreview.isPopulated && metadataSettings.isPopulated;
-      props.error = retagPreview.error || metadataSettings.error;
-      const writeAudioTags = metadataSettings.item.writeAudioTags;
-      props.retagTracks = writeAudioTags === 'allFiles' || writeAudioTags === 'sync';
+      props.isFetching = retagPreview.isFetching;
+      props.isPopulated = retagPreview.isPopulated;
+      props.error = retagPreview.error;
       props.path = artist.path;
 
       return props;
@@ -30,7 +26,6 @@ function createMapStateToProps() {
 
 const mapDispatchToProps = {
   fetchRetagPreview,
-  fetchMetadataProvider,
   executeCommand
 };
 
@@ -40,24 +35,15 @@ class RetagPreviewModalContentConnector extends Component {
   // Lifecycle
 
   componentDidMount() {
-    this.props.fetchMetadataProvider();
-  }
-
-  componentDidUpdate(prevProps) {
     const {
       artistId,
-      albumId,
-      retagTracks,
-      isPopulated,
-      isFetching
+      albumId
     } = this.props;
 
-    if (retagTracks && !isPopulated && !isFetching) {
-      this.props.fetchRetagPreview({
-        artistId,
-        albumId
-      });
-    }
+    this.props.fetchRetagPreview({
+      artistId,
+      albumId
+    });
   }
 
   //
@@ -93,7 +79,6 @@ RetagPreviewModalContentConnector.propTypes = {
   isPopulated: PropTypes.bool.isRequired,
   isFetching: PropTypes.bool.isRequired,
   fetchRetagPreview: PropTypes.func.isRequired,
-  fetchMetadataProvider: PropTypes.func.isRequired,
   executeCommand: PropTypes.func.isRequired,
   onModalClose: PropTypes.func.isRequired
 };

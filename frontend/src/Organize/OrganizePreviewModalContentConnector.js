@@ -19,7 +19,6 @@ function createMapStateToProps() {
       props.isFetching = organizePreview.isFetching || naming.isFetching;
       props.isPopulated = organizePreview.isPopulated && naming.isPopulated;
       props.error = organizePreview.error || naming.error;
-      props.renameTracks = naming.item.renameTracks;
       props.trackFormat = naming.item.standardTrackFormat;
       props.path = artist.path;
 
@@ -40,24 +39,17 @@ class OrganizePreviewModalContentConnector extends Component {
   // Lifecycle
 
   componentDidMount() {
-    this.props.fetchNamingSettings();
-  }
-
-  componentDidUpdate() {
     const {
       artistId,
-      albumId,
-      renameTracks,
-      isPopulated,
-      isFetching
+      albumId
     } = this.props;
 
-    if (renameTracks && !isPopulated && !isFetching) {
-      this.props.fetchOrganizePreview({
-        artistId,
-        albumId
-      });
-    }
+    this.props.fetchOrganizePreview({
+      artistId,
+      albumId
+    });
+
+    this.props.fetchNamingSettings();
   }
 
   //
@@ -89,9 +81,6 @@ class OrganizePreviewModalContentConnector extends Component {
 OrganizePreviewModalContentConnector.propTypes = {
   artistId: PropTypes.number.isRequired,
   albumId: PropTypes.number,
-  renameTracks: PropTypes.bool.isRequired,
-  isPopulated: PropTypes.bool.isRequired,
-  isFetching: PropTypes.bool.isRequired,
   fetchOrganizePreview: PropTypes.func.isRequired,
   fetchNamingSettings: PropTypes.func.isRequired,
   executeCommand: PropTypes.func.isRequired,

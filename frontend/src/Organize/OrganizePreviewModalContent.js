@@ -74,7 +74,6 @@ class OrganizePreviewModalContent extends Component {
       isPopulated,
       error,
       items,
-      renameTracks,
       trackFormat,
       path,
       onModalClose
@@ -106,18 +105,12 @@ class OrganizePreviewModalContent extends Component {
           }
 
           {
-            !isFetching && ((isPopulated && !items.length) || !renameTracks) &&
-              <div>
-                {
-                  renameTracks ?
-                    <div>Success! My work is done, no files to rename.</div> :
-                    <div>Renaming is disabled, nothing to rename.</div>
-                }
-              </div>
+            !isFetching && isPopulated && !items.length &&
+              <div>Success! My work is done, no files to rename.</div>
           }
 
           {
-            !isFetching && isPopulated && !!items.length && renameTracks &&
+            !isFetching && isPopulated && !!items.length &&
               <div>
                 <Alert>
                   <div>
@@ -157,7 +150,7 @@ class OrganizePreviewModalContent extends Component {
 
         <ModalFooter>
           {
-            isPopulated && !!items.length && renameTracks &&
+            isPopulated && !!items.length &&
               <CheckInput
                 className={styles.selectAllInput}
                 containerClassName={styles.selectAllInputContainer}
@@ -176,7 +169,6 @@ class OrganizePreviewModalContent extends Component {
           <Button
             kind={kinds.PRIMARY}
             onPress={this.onOrganizePress}
-            isDisabled={!renameTracks}
           >
             Organize
           </Button>
@@ -192,7 +184,6 @@ OrganizePreviewModalContent.propTypes = {
   error: PropTypes.object,
   items: PropTypes.arrayOf(PropTypes.object).isRequired,
   path: PropTypes.string.isRequired,
-  renameTracks: PropTypes.bool,
   trackFormat: PropTypes.string,
   onOrganizePress: PropTypes.func.isRequired,
   onModalClose: PropTypes.func.isRequired

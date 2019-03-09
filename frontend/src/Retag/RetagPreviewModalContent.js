@@ -74,7 +74,6 @@ class RetagPreviewModalContent extends Component {
       isPopulated,
       error,
       items,
-      retagTracks,
       path,
       onModalClose
     } = this.props;
@@ -105,18 +104,12 @@ class RetagPreviewModalContent extends Component {
           }
 
           {
-            !isFetching && ((isPopulated && !items.length) || !retagTracks) &&
-              <div>
-                {
-                  retagTracks ?
-                    <div>Success! My work is done, no files to retag.</div> :
-                    <div>Retagging is disabled for existing library files, nothing to retag.</div>
-                }
-              </div>
+            !isFetching && ((isPopulated && !items.length)) &&
+              <div>Success! My work is done, no files to retag.</div>
           }
 
           {
-            !isFetching && isPopulated && !!items.length && retagTracks &&
+            !isFetching && isPopulated && !!items.length &&
               <div>
                 <Alert>
                   <div>
@@ -152,7 +145,7 @@ class RetagPreviewModalContent extends Component {
 
         <ModalFooter>
           {
-            isPopulated && !!items.length && retagTracks &&
+            isPopulated && !!items.length &&
               <CheckInput
                 className={styles.selectAllInput}
                 containerClassName={styles.selectAllInputContainer}
@@ -171,7 +164,6 @@ class RetagPreviewModalContent extends Component {
           <Button
             kind={kinds.PRIMARY}
             onPress={this.onRetagPress}
-            isDisabled={!retagTracks}
           >
             Retag
           </Button>
@@ -187,7 +179,6 @@ RetagPreviewModalContent.propTypes = {
   error: PropTypes.object,
   items: PropTypes.arrayOf(PropTypes.object).isRequired,
   path: PropTypes.string.isRequired,
-  retagTracks: PropTypes.bool,
   onRetagPress: PropTypes.func.isRequired,
   onModalClose: PropTypes.func.isRequired
 };
