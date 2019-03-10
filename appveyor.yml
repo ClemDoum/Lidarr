@@ -19,7 +19,7 @@ install:
   - git submodule update --init --recursive
   - cmd: powershell Install-Product node $env:nodejs_version
   - sh: nvm install $nodejs_version
-  - sh: sudo apt-get install dos2unix nuget libchromaprint-tools
+  - sh: sudo apt-get install -y dos2unix nuget libchromaprint-tools
 
 build_script:
   - cmd: C:\msys64\usr\bin\bash -lc "cd \"$APPVEYOR_BUILD_FOLDER\" && exec ./build.sh
