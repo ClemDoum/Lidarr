@@ -20,7 +20,7 @@ install:
   - cmd: powershell Install-Product node $env:nodejs_version
   - sh: nvm install $nodejs_version
   - sh: sudo apt update
-  - sh: sudo apt install -y nuget libchromaprint-tools
+  - sh: sudo apt install -y libchromaprint-tools
 
 build_script:
   - cmd: C:\msys64\usr\bin\bash -lc "cd \"$APPVEYOR_BUILD_FOLDER\" && exec ./build.sh
