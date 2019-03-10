@@ -80,7 +80,7 @@ function MetadataProvider(props) {
               {
                 settings.writeAudioTags.value !== 'no' &&
                   <FormGroup>
-                    <FormLabel>Scrub Existing Metadata from Audio Files</FormLabel>
+                    <FormLabel>Scrub Existing Tags</FormLabel>
 
                     <FormInputGroup
                       type={inputTypes.CHECK}
