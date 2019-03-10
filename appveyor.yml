@@ -19,7 +19,7 @@ install:
   - git submodule update --init --recursive
   - cmd: powershell Install-Product node $env:nodejs_version
   - sh: nvm install $nodejs_version
-  - sh: sudo apt udpate
+  - sh: sudo apt update
   - sh: sudo apt install -y ca-certificates-mono 
   - sh: sudo apt install -y nuget libchromaprint-tools
 
