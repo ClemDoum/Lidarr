@@ -22,13 +22,10 @@ PublishArtifacts()
     7z a -tgzip $artifactsFolder/Lidarr.${APPVEYOR_REPO_BRANCH}.${APPVEYOR_BUILD_VERSION}.linux.tar.gz $artifactsFolder/Lidarr.${APPVEYOR_REPO_BRANCH}.${APPVEYOR_BUILD_VERSION}.linux.tar
     rm -f $artifactsFolder/Lidarr.${APPVEYOR_REPO_BRANCH}.${APPVEYOR_BUILD_VERSION}.linux.tar
 
-    if [ ${CI_LINUX} = true ] ; then
-        mono ./setup/inno/ISCC.exe "./setup/lidarr.iss"
-    else
+    if [ ${CI_WINDOWS} = true ] ; then
         ./setup/inno/ISCC.exe "./setup/lidarr.iss"
+        cp ./setup/output/Lidarr.*windows.exe $artifactsFolder/Lidarr.${APPVEYOR_REPO_BRANCH}.${APPVEYOR_BUILD_VERSION}.windows-installer.exe        
     fi
-
-    cp ./setup/output/Lidarr.*windows.exe $artifactsFolder/Lidarr.${APPVEYOR_REPO_BRANCH}.${APPVEYOR_BUILD_VERSION}.windows-installer.exe
 }
 
 PublishArtifacts
