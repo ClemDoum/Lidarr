@@ -22,7 +22,7 @@ PublishArtifacts()
     7z a -tgzip $artifactsFolder/Lidarr.${APPVEYOR_REPO_BRANCH}.${APPVEYOR_BUILD_VERSION}.linux.tar.gz $artifactsFolder/Lidarr.${APPVEYOR_REPO_BRANCH}.${APPVEYOR_BUILD_VERSION}.linux.tar
     rm -f $artifactsFolder/Lidarr.${APPVEYOR_REPO_BRANCH}.${APPVEYOR_BUILD_VERSION}.linux.tar
 
-    if [ ${CI_LINUX} ] ; then
+    if [ ${CI_LINUX} = true ] ; then
         mono ./setup/inno/ISCC.exe "./setup/lidarr.iss"
     else
         ./setup/inno/ISCC.exe "./setup/lidarr.iss"
