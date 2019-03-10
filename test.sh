@@ -21,7 +21,7 @@ if [[ -z "${APPVEYOR}" ]]; then
   NUNIT_COMMAND="$NUNIT"
   NUNIT_PARAMS="--workers=1"
 else
-  NUNIT="nunit3-console"
+  NUNIT="$TEST_DIR/NUnit.ConsoleRunner.3.7.0/tools/nunit3-console.exe"
   NUNIT_COMMAND="$NUNIT"
   NUNIT_PARAMS="--result=myresults.xml;format=AppVeyor --workers=1"
   unset TMP
