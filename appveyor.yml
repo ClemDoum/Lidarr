@@ -20,7 +20,6 @@ install:
   - cmd: powershell Install-Product node $env:nodejs_version
   - sh: nvm install $nodejs_version
   - sh: sudo apt update
-  - sh: sudo apt install -y ca-certificates-mono 
   - sh: sudo apt install -y nuget libchromaprint-tools
 
 build_script:
@@ -40,9 +39,9 @@ test_script:
   - cmd: C:\msys64\usr\bin\bash -lc "cd \"$APPVEYOR_BUILD_FOLDER\" && exec ./test.sh Windows Unit
   - sh: ./test.sh Linux Unit
 
-cache:
-  - '%USERPROFILE%\.nuget\packages'
-  - node_modules -> package.json
+#cache:
+#  - '%USERPROFILE%\.nuget\packages'
+#  - node_modules -> package.json
   
 pull_requests:
   do_not_increment_build_number: true
